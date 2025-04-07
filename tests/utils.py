@@ -103,7 +103,6 @@ def create_groupings(inputs: list[int] | tuple[int, ...]) -> Iterator[list[set[i
             yield grouping
 
 
-
 def load_fixture(fixture_name: str) -> dict:
     fixture_path = Path(__file__).parent / "fixtures" / f"{fixture_name}.json"
     with fixture_path.open() as f:

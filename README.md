@@ -41,17 +41,17 @@ import { acyclic_toposort, cyclic_toposort, Edge } from "cyclic-toposort-ts";
 
 ```typescript
 const edges: Set<Edge> = new Set([
-  [1, 2],
-  [2, 3],
-  [3, 5],
-  [3, 6],
-  [4, 1],
-  [4, 5],
-  [4, 6],
-  [5, 2],
-  [5, 7],
-  [6, 1],
-  [8, 6],
+	[1, 2],
+	[2, 3],
+	[3, 5],
+	[3, 6],
+	[4, 1],
+	[4, 5],
+	[4, 6],
+	[5, 2],
+	[5, 7],
+	[6, 1],
+	[8, 6],
 ]);
 ```
 
@@ -75,14 +75,14 @@ console.log(cyclicEdges2);
 
 ```typescript
 const acyclicEdges: Set<Edge> = new Set([
-  [1, 2],
-  [1, 3],
-  [2, 3],
-  [2, 4],
-  [3, 4],
-  [5, 3],
-  [5, 6],
-  [7, 6],
+	[1, 2],
+	[1, 3],
+	[2, 3],
+	[2, 4],
+	[3, 4],
+	[5, 3],
+	[5, 6],
+	[7, 6],
 ]);
 
 const topology = acyclic_toposort(acyclicEdges);
@@ -119,8 +119,8 @@ function acyclic_toposort(edges: Iterable<Edge>): Topology;
 
 ```typescript
 function cyclic_toposort(
-  edges: Set<Edge>,
-  start_node?: number | null,
+	edges: Set<Edge>,
+	start_node?: number | null
 ): CyclicResult;
 ```
 

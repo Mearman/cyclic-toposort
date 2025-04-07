@@ -3,7 +3,7 @@ export type Topology = Array<Set<number>>;
 export type CyclicResult = [Topology, Set<Edge>];
 
 export type ReducedGraphResult = {
-  reduced_ins: Map<number, Set<number>>;
-  reduced_outs: Map<number, Set<number>>;
-  forced_cyclic_edges: Set<Edge>;
+	reduced_ins: Map<number, Set<number>>;
+	reduced_outs: Map<number, Set<number>>;
+	forced_cyclic_edges: Set<Edge>;
 };

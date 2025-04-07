@@ -1,7 +1,18 @@
 {
   "graph": {
-    "A": ["A"]
+    "A": [
+      "A"
+    ]
   },
-  "expected": [["A", "A"]],
-  "topology": [["A"]]
+  "expected": [
+    [
+      "A",
+      "A"
+    ]
+  ],
+  "topology": [
+    [
+      "A"
+    ]
+  ]
 }

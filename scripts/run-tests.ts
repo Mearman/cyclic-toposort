@@ -1,4 +1,4 @@
-import { spawn, execSync, SpawnOptions } from "child_process"; // Added execSync
+import { execSync, spawn, SpawnOptions } from "child_process"; // Added execSync
 import path from "path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
@@ -67,7 +67,9 @@ async function runCommand(
 				// In TAP mode, stderr might contain useful info even on success (e.g., warnings)
 				// or failure details not in TAP format. Let's print stderr if it exists.
 				if (stderrData) {
-					console.error(`\n--- ${suiteName} stderr ---\n${stderrData}\n--- End ${suiteName} stderr ---`);
+					console.error(
+						`\n--- ${suiteName} stderr ---\n${stderrData}\n--- End ${suiteName} stderr ---`
+					);
 				}
 			}
 			resolve({
@@ -103,23 +105,28 @@ async function runAllTests() {
 		console.log("TAP version 13");
 	}
 
-	   // --- Python Dependency Check ---
-	   try {
-	       // Check if pytest-tap is installed via poetry
-	       execSync("poetry run pip show pytest-tap", { stdio: "ignore" });
-	   } catch (error) {
-	       console.error("\n❌ Error: 'pytest-tap' not found in the Python environment.");
-	       console.error("   Please run 'poetry install' in your terminal to install dependencies.");
-	       process.exit(1); // Exit with error code
-	   }
-	   // --- End Python Dependency Check ---
-
+	// --- Python Dependency Check ---
+	try {
+		// Check if pytest-tap is installed via poetry
+		execSync("poetry run pip show pytest-tap", { stdio: "ignore" });
+	} catch (error) {
+		console.error(
+			"\n❌ Error: 'pytest-tap' not found in the Python environment."
+		);
+		console.error(
+			"   Please run 'poetry install' in your terminal to install dependencies."
+		);
+		process.exit(1); // Exit with error code
+	}
+	// --- End Python Dependency Check ---
 
 	// Define test commands and arguments conditionally
 	const pythonTestCommand = "poetry";
 	const pythonTestArgs = ["run", "pytest"];
 	if (isTapOutputMode) {
 		pythonTestArgs.push("--tap-stream");
+	} else {
+		pythonTestArgs.push("-v"); // Add verbose flag for non-TAP mode
 	}
 
 	const nodeTestCommand = "yarn"; // Or "npm" or "pnpm" depending on your setup
@@ -128,8 +135,10 @@ async function runAllTests() {
 		nodeTestArgs.push("--reporter=tap");
 	}
 
-
 	// Run tests sequentially
+	else {
+		nodeTestArgs.push("--reporter", "verbose"); // Add verbose reporter for non-TAP mode
+	}
 	const pythonResult = await runCommand(
 		pythonTestCommand,
 		pythonTestArgs,
@@ -160,8 +169,13 @@ async function runAllTests() {
 		}
 		// TAP summary line (optional but good practice)
 		// Count total tests from TAP output (simple line count for now)
-		const pythonTests = pythonResult.stdout?.split('\n').filter(line => line.match(/^ok|^not ok/)).length || 0;
-		const nodeTests = nodeResult.stdout?.split('\n').filter(line => line.match(/^ok|^not ok/)).length || 0;
+		const pythonTests =
+			pythonResult.stdout
+				?.split("\n")
+				.filter((line) => line.match(/^ok|^not ok/)).length || 0;
+		const nodeTests =
+			nodeResult.stdout?.split("\n").filter((line) => line.match(/^ok|^not ok/))
+				.length || 0;
 		console.log(`1..${pythonTests + nodeTests}`);
 	} else {
 		// Summarize results for human-readable output
@@ -176,10 +190,11 @@ async function runAllTests() {
 		console.log(
 			`\nOverall status: ${overallPassed ? "All tests passed!" : "Some tests failed."}`
 		);
-		      // Reminder about dependencies
-		      console.log("\nReminder: Ensure dependencies are installed with 'poetry install' and 'yarn install'.");
+		// Reminder about dependencies
+		console.log(
+			"\nReminder: Ensure dependencies are installed with 'poetry install' and 'yarn install'."
+		);
 	}
-
 
 	process.exit(exitCode);
 }

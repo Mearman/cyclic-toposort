@@ -3,5 +3,9 @@
     "A": []
   },
   "expected": [],
-  "topology": [["A"]]
+  "topology": [
+    [
+      "A"
+    ]
+  ]
 }

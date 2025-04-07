@@ -5,9 +5,10 @@ from cyclic_toposort import cyclic_toposort
 
 FIXTURE_DIR = pathlib.Path(__file__).parent / "fixtures"
 
+
 def load_fixture_data(file_path: pathlib.Path):
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             data = json.load(f)
             if "graph" not in data or "expected" not in data:
                 print(f"Warning: Skipping {file_path.name}. Missing 'graph' or 'expected' key.")
@@ -20,11 +21,12 @@ def load_fixture_data(file_path: pathlib.Path):
         print(f"Warning: Error loading {file_path.name}: {e}")
         return None
 
+
 def get_test_fixtures():
     fixtures = []
     if not FIXTURE_DIR.is_dir():
         print(f"Warning: Fixture directory not found: {FIXTURE_DIR}")
-        return fixtures # Return empty list if directory doesn't exist
+        return fixtures  # Return empty list if directory doesn't exist
 
     for file_path in FIXTURE_DIR.glob("*.json"):
         fixture_data = load_fixture_data(file_path)
@@ -32,6 +34,7 @@ def get_test_fixtures():
             test_id = file_path.stem
             fixtures.append(pytest.param(file_path.name, fixture_data, id=test_id))
     return fixtures
+
 
 @pytest.mark.parametrize("filename, fixture_data", get_test_fixtures())
 def test_cyclic_toposort_from_fixture(filename, fixture_data):
@@ -47,8 +50,8 @@ def test_cyclic_toposort_from_fixture(filename, fixture_data):
         start_node_str = str(start_node)
         all_nodes.add(start_node_str)
         if not isinstance(neighbors, list):
-             print(f"Warning: Neighbors for node '{start_node_str}' in {filename} is not a list. Skipping node.")
-             continue
+            print(f"Warning: Neighbors for node '{start_node_str}' in {filename} is not a list. Skipping node.")
+            continue
         for neighbor in neighbors:
             neighbor_str = str(neighbor)
             edges.add((start_node_str, neighbor_str))
