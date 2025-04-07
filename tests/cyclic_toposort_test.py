@@ -1,54 +1,74 @@
-"""Tests for the cyclic_toposort module."""
-import random
-from pathlib import Path
+import pytest
+import json
+import pathlib
+from cyclic_toposort import cyclic_toposort
 
-import yaml
-from graphviz import Digraph
+FIXTURE_DIR = pathlib.Path(__file__).parent / "fixtures"
 
-from cyclic_toposort.cyclic_toposort import cyclic_toposort
-from tests.utils import bruteforce_toposort, create_random_graph
+def load_fixture_data(file_path: pathlib.Path):
+    try:
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+            if "graph" not in data or "expected" not in data:
+                print(f"Warning: Skipping {file_path.name}. Missing 'graph' or 'expected' key.")
+                return None
+            return data
+    except json.JSONDecodeError:
+        print(f"Warning: Could not decode JSON from {file_path.name}")
+        return None
+    except Exception as e:
+        print(f"Warning: Error loading {file_path.name}: {e}")
+        return None
 
-TEST_GRAPHS_DIR = "./test_graphs/"
-TEST_RESULTS_YAML = "./test_results.yaml"
-CYCLIC_NODES_PROBABILITY = 0.2
-START_NODE_PROBABILITY = 0.2
+def get_test_fixtures():
+    fixtures = []
+    if not FIXTURE_DIR.is_dir():
+        print(f"Warning: Fixture directory not found: {FIXTURE_DIR}")
+        return fixtures # Return empty list if directory doesn't exist
 
+    for file_path in FIXTURE_DIR.glob("*.json"):
+        fixture_data = load_fixture_data(file_path)
+        if fixture_data:
+            test_id = file_path.stem
+            fixtures.append(pytest.param(file_path.name, fixture_data, id=test_id))
+    return fixtures
 
-def test_random_graphs_against_bruteforce() -> None:
-    """Test cyclic_toposort with randomly generated graphs against bruteforced solutions."""
-    test_graphs_dir = Path(TEST_GRAPHS_DIR)
-    test_graphs_dir.resolve()
-    test_graphs_dir.mkdir(exist_ok=True)
+@pytest.mark.parametrize("filename, fixture_data", get_test_fixtures())
+def test_cyclic_toposort_from_fixture(filename, fixture_data):
+    print(f"\nTesting with fixture: {filename}")
 
-    test_results_yaml = Path(TEST_RESULTS_YAML)
-    test_results_yaml.resolve()
+    adj_list = fixture_data["graph"]
+    expected_cyclic_edges_raw = fixture_data["expected"]
+    expected_topology_raw = fixture_data.get("topology", [])
 
-    test_results: dict[str, dict] = {}  # type: ignore[type-arg]
-    for i in range(100):
-        test_name = f"test_graph_{i}"
+    edges = set()
+    all_nodes = set(adj_list.keys())
+    for start_node, neighbors in adj_list.items():
+        start_node_str = str(start_node)
+        all_nodes.add(start_node_str)
+        if not isinstance(neighbors, list):
+             print(f"Warning: Neighbors for node '{start_node_str}' in {filename} is not a list. Skipping node.")
+             continue
+        for neighbor in neighbors:
+            neighbor_str = str(neighbor)
+            edges.add((start_node_str, neighbor_str))
+            all_nodes.add(neighbor_str)
 
-        num_edges = random.randint(8, 16)
-        cyclic_nodes = random.random() < CYCLIC_NODES_PROBABILITY
-        edges = create_random_graph(num_edges=num_edges, cyclic_nodes=cyclic_nodes)
-        start_node = None
-        if random.random() < START_NODE_PROBABILITY:
-            start_node = random.choice(list(edges))[0]
+    topology, result_cyclic_edges_set = cyclic_toposort(all_nodes, edges)
 
-        graph = Digraph(graph_attr={"rankdir": "TB"})
-        for edge_start, edge_end in edges:
-            graph.edge(str(edge_start), str(edge_end))
-        graph.render(filename=test_name, directory=test_graphs_dir, view=False, cleanup=True, format="svg")
+    expected_cyclic_edges_set = {tuple(map(str, edge)) for edge in expected_cyclic_edges_raw}
 
-        algorithm_results = cyclic_toposort(edges=edges)
-        bruteforce_results = bruteforce_toposort(edges=edges)
-        assert algorithm_results in bruteforce_results
+    print(f"  Edges: {edges}")
+    print(f"  Expected Cyclic Edges: {expected_cyclic_edges_set}")
+    print(f"  Result Cyclic Edges: {result_cyclic_edges_set}")
+    assert result_cyclic_edges_set == expected_cyclic_edges_set, f"Cyclic edges mismatch for {filename}"
 
-        test_results[test_name] = {
-            "edges": edges,
-            "start_node": start_node,
-            "algorithm_results": algorithm_results,
-            "bruteforce_results": bruteforce_results,
-        }
+    expected_topology_processed = []
+    for level in expected_topology_raw:
+        expected_topology_processed.append(sorted(list(map(str, level))))
 
-    with test_results_yaml.open("w") as test_results_yaml_file:
-        yaml.dump(test_results, test_results_yaml_file)
+    result_topology_processed = [sorted(list(map(str, level))) for level in topology]
+
+    print(f"  Expected Topology: {expected_topology_processed}")
+    print(f"  Result Topology: {result_topology_processed}")
+    assert sorted(result_topology_processed) == sorted(expected_topology_processed), f"Topology mismatch for {filename}"

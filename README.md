@@ -34,7 +34,7 @@ yarn add cyclic-toposort-ts
 ### Import
 
 ```typescript
-import { acyclic_toposort, cyclic_toposort, Edge } from 'cyclic-toposort-ts';
+import { acyclic_toposort, cyclic_toposort, Edge } from "cyclic-toposort-ts";
 ```
 
 ### Define edges
@@ -59,8 +59,8 @@ const edges: Set<Edge> = new Set([
 
 ```typescript
 const [topology, cyclicEdges] = cyclic_toposort(edges);
-console.log(topology);      // Array of Sets of node IDs (topological levels)
-console.log(cyclicEdges);   // Set of edges causing cycles
+console.log(topology); // Array of Sets of node IDs (topological levels)
+console.log(cyclicEdges); // Set of edges causing cycles
 ```
 
 With a forced cyclic start node:
@@ -108,7 +108,7 @@ type CyclicResult = [Topology, Set<Edge>];
 #### `acyclic_toposort`
 
 ```typescript
-function acyclic_toposort(edges: Iterable<Edge>): Topology
+function acyclic_toposort(edges: Iterable<Edge>): Topology;
 ```
 
 - **edges**: Iterable of `[startNode, endNode]` tuples.
@@ -118,7 +118,10 @@ function acyclic_toposort(edges: Iterable<Edge>): Topology
 #### `cyclic_toposort`
 
 ```typescript
-function cyclic_toposort(edges: Set<Edge>, start_node?: number | null): CyclicResult
+function cyclic_toposort(
+  edges: Set<Edge>,
+  start_node?: number | null,
+): CyclicResult;
 ```
 
 - **edges**: Set of `[startNode, endNode]` tuples.
@@ -145,4 +148,3 @@ function cyclic_toposort(edges: Set<Edge>, start_node?: number | null): CyclicRe
 ## License
 
 MIT License © 2025
-

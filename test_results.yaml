@@ -1,0 +1,294 @@
+test_graph_0:
+  algorithm_results: !!python/tuple
+  - - !!set
+      2: null
+    - !!set
+      3: null
+    - !!set
+      4: null
+    - !!set
+      1: null
+  - !!set
+    ? !!python/tuple
+    - 1
+    - 2
+    : null
+  bruteforce_results:
+  - !!python/tuple
+    - - !!set
+        2: null
+      - !!set
+        3: null
+      - !!set
+        4: null
+      - !!set
+        1: null
+    - !!set
+      ? !!python/tuple
+      - 1
+      - 2
+      : null
+  - !!python/tuple
+    - - !!set
+        3: null
+      - !!set
+        4: null
+      - !!set
+        1: null
+      - !!set
+        2: null
+    - !!set
+      ? !!python/tuple
+      - 2
+      - 3
+      : null
+  edges: !!set
+    ? &id001 !!python/tuple
+    - 1
+    - 2
+    : null
+    ? !!python/tuple
+    - 2
+    - 3
+    : null
+    ? !!python/tuple
+    - 3
+    - 1
+    : null
+    ? !!python/tuple
+    - 3
+    - 4
+    : null
+    ? !!python/tuple
+    - 4
+    - 1
+    : null
+  start_node: null
+test_graph_1:
+  algorithm_results: !!python/tuple
+  - - !!set
+      1: null
+    - !!set
+      3: null
+      4: null
+    - !!set
+      2: null
+    - !!set
+      5: null
+      6: null
+  - !!set
+    ? !!python/tuple
+    - 2
+    - 1
+    : null
+  bruteforce_results:
+  - !!python/tuple
+    - - !!set
+        1: null
+      - !!set
+        3: null
+      - !!set
+        2: null
+      - !!set
+        4: null
+        5: null
+        6: null
+    - !!set
+      ? !!python/tuple
+      - 2
+      - 1
+      : null
+  - !!python/tuple
+    - - !!set
+        1: null
+      - !!set
+        3: null
+      - !!set
+        2: null
+        4: null
+      - !!set
+        5: null
+        6: null
+    - !!set
+      ? !!python/tuple
+      - 2
+      - 1
+      : null
+  - !!python/tuple
+    - - !!set
+        1: null
+      - !!set
+        3: null
+        4: null
+      - !!set
+        2: null
+      - !!set
+        5: null
+        6: null
+    - !!set
+      ? !!python/tuple
+      - 2
+      - 1
+      : null
+  edges: !!set
+    *id001: null
+    ? !!python/tuple
+    - 1
+    - 3
+    : null
+    ? !!python/tuple
+    - 1
+    - 4
+    : null
+    ? !!python/tuple
+    - 1
+    - 5
+    : null
+    ? !!python/tuple
+    - 2
+    - 1
+    : null
+    ? !!python/tuple
+    - 2
+    - 5
+    : null
+    ? !!python/tuple
+    - 2
+    - 6
+    : null
+    ? !!python/tuple
+    - 3
+    - 2
+    : null
+  start_node: 1
+test_graph_2:
+  algorithm_results: !!python/tuple
+  - - !!set
+      1: null
+    - !!set
+      3: null
+    - !!set
+      2: null
+    - !!set
+      4: null
+  - !!set {}
+  bruteforce_results:
+  - !!python/tuple
+    - - !!set
+        1: null
+      - !!set
+        3: null
+      - !!set
+        2: null
+      - !!set
+        4: null
+    - !!set {}
+  edges: !!set
+    *id001: null
+    ? !!python/tuple
+    - 1
+    - 3
+    : null
+    ? !!python/tuple
+    - 2
+    - 4
+    : null
+    ? !!python/tuple
+    - 3
+    - 2
+    : null
+  start_node: null
+test_graph_3:
+  algorithm_results: !!python/tuple
+  - - !!set
+      2: null
+    - !!set
+      1: null
+    - !!set
+      3: null
+  - !!set
+    ? !!python/tuple
+    - 1
+    - 2
+    : null
+  bruteforce_results:
+  - !!python/tuple
+    - - !!set
+        1: null
+      - !!set
+        2: null
+      - !!set
+        3: null
+    - !!set
+      ? !!python/tuple
+      - 2
+      - 1
+      : null
+  - !!python/tuple
+    - - !!set
+        2: null
+      - !!set
+        1: null
+      - !!set
+        3: null
+    - !!set
+      ? !!python/tuple
+      - 1
+      - 2
+      : null
+  edges: !!set
+    *id001: null
+    ? !!python/tuple
+    - 1
+    - 3
+    : null
+    ? !!python/tuple
+    - 2
+    - 1
+    : null
+    ? !!python/tuple
+    - 2
+    - 3
+    : null
+  start_node: null
+test_graph_4:
+  algorithm_results: !!python/tuple
+  - - !!set
+      3: null
+    - !!set
+      4: null
+    - !!set
+      1: null
+    - !!set
+      2: null
+  - !!set {}
+  bruteforce_results:
+  - !!python/tuple
+    - - !!set
+        3: null
+      - !!set
+        4: null
+      - !!set
+        1: null
+      - !!set
+        2: null
+    - !!set {}
+  edges: !!set
+    *id001: null
+    ? !!python/tuple
+    - 3
+    - 1
+    : null
+    ? !!python/tuple
+    - 3
+    - 3
+    : null
+    ? !!python/tuple
+    - 3
+    - 4
+    : null
+    ? !!python/tuple
+    - 4
+    - 1
+    : null
+  start_node: 1

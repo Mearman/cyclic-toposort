@@ -23,29 +23,30 @@
 from collections.abc import Iterable
 
 
-def acyclic_toposort(edges: Iterable[tuple[int, int]]) -> list[set[int]]:
+def acyclic_toposort(nodes: set[int], edges: Iterable[tuple[int, int]]) -> list[set[int]]:
     """Create and return a topological sorting of an acyclic graph as a list of sets, each set representing a
     topological level, starting with the nodes that have no dependencies.
 
+    :param nodes: A set of all nodes in the graph.
     :param edges: iterable of edges represented as 2-tuples, whereas each 2-tuple represents the start-index and end-
         index of an edge
-    :return: topological sorting of the graph represented by the input edges as a list of sets that represent each
-        topological level in order beginning with all dependencyless nodes.
-    :raises RuntimeError: if a cyclic graph is detected.
+    :return: topological sorting of the graph represented by the input nodes and edges as a list of sets that represent
+        each topological level in order beginning with all dependencyless nodes.
+    :raises RuntimeError: if a cyclic graph is detected (should not happen if called after cycle removal).
     """
     # Create dict that associates each node with the set of all nodes that having an incoming edge (node_ins) to
     # that particular node. If a node has no incoming connections will the node be associated with an empty set.
-    node_ins: dict[int, set[int]] = {}
+    # Initialize node_ins with all nodes to handle isolated nodes correctly.
+    node_ins: dict[int, set[int]] = {node: set() for node in nodes}
+    # Populate node_ins based on the provided edges.
+    # Nodes not in edges but present in the 'nodes' set will retain their empty 'incomings' set.
     for edge_start, edge_end in edges:
-        # Don't consider cyclic node edges as not relevant for topological sorting
-        if edge_start == edge_end:
-            continue
-
-        # Ensure that each node is present in the node_ins dict, even if it has no incoming edges
-        node_ins.setdefault(edge_start, set())
-
-        # Add the edge_start node to the set of incoming nodes of the edge_end node
-        node_ins.setdefault(edge_end, set()).add(edge_start)
+        # Self-loops and other cyclic edges should have been removed by the caller.
+        # If edge_end is not in node_ins it means the edge references a node not in the initial 'nodes' set.
+        # This could be an error in the input, but we'll proceed assuming nodes are correct.
+        # If edge_start is not in node_ins, it's handled implicitly as it won't have incomings added.
+        if edge_end in node_ins:
+            node_ins[edge_end].add(edge_start)
 
     # Create the topological sorting of the graph represented by the input edges as a list of sets that represent each
     # topological level in order beginning with all dependencyless nodes.
@@ -55,8 +56,11 @@ def acyclic_toposort(edges: Iterable[tuple[int, int]]) -> list[set[int]]:
         dependencyless = {node for node, incomings in node_ins.items() if not incomings}
 
         if not dependencyless:
-            msg = "Cyclic graph detected in acyclic_toposort function" if node_ins else "Invalid graph detected"
-            raise RuntimeError(msg)
+            # If node_ins is not empty, it means we have a cycle
+            if node_ins:
+                raise RuntimeError("Cyclic graph detected in acyclic_toposort function")
+            # Otherwise, we've processed all nodes
+            break
 
         # Set dependencyless nodes as the nodes of the next topological level
         graph_topology.append(dependencyless)
@@ -69,8 +73,6 @@ def acyclic_toposort(edges: Iterable[tuple[int, int]]) -> list[set[int]]:
         if not node_ins:
             break
 
-        # Remove depdencyless nodes from node_ins (the set of required incoming nodes) as those dependencyless nodes
-        # have been placed and their dependency to other nodes is therefore fulfilled
         node_ins = {node: incomings - dependencyless for node, incomings in node_ins.items()}
 
     return graph_topology

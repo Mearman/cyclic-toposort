@@ -1,21 +1,15 @@
-"""Module for utility functions used in tests."""
 import itertools
 import random
 import sys
 from collections.abc import Iterator
+import json
+from pathlib import Path
 
 
 def create_random_graph(
     num_edges: int,
     cyclic_nodes: bool = False,
 ) -> set[tuple[int, int]]:
-    """Generate a random graph with the given number of edges.
-
-    :param num_edges: The desired number of edges in the graph. Minimum of 1.
-    :param cyclic_nodes: If True, allows edges to loop back to their starting node; if False, edges are strictly between
-        distinct nodes.
-    :return: A set of edges represented as tuples where each tuple contains two integers corresponding to node IDs.
-    """
     nodes = [1, 2]
     edges = {(1, 2)}
 
@@ -42,22 +36,11 @@ def bruteforce_toposort(
     edges: set[tuple[int, int]],
     start_node: int | None = None,
 ) -> list[tuple[list[set[int]], set[tuple[int, int]]]]:
-    """Determine all possible graph topologies for a given set of edges that yield a minimal number of necessary cyclic
-    edges and a minimal number of necessary topological groupings.
-
-    :param edges: A set of tuples where each tuple represents a directed edge (start_node, end_node) in the graph.
-    :param start_node: An optional node. If provided, any edge leading into this node will be considered as a forced
-        cyclic edge.
-    :return: A list of tuples consisting of
-        - A graph topology with the minimum number of topological groupings.
-        - A minimal set of edges that are necessary to be considered cyclic in order to make the graph acyclic.
-    """
     minimal_graph_topologies = []
     minimal_graph_topology_groupings = sys.maxsize
     minimal_cyclic_edges = sys.maxsize
     previously_checked_graph_topologies = []
 
-    # Remove single node cyclic edges
     edges = {(edge_start, edge_end) for (edge_start, edge_end) in edges if edge_start != edge_end}
     nodes = {node for edge in edges for node in edge}
 
@@ -78,7 +61,6 @@ def bruteforce_toposort(
                 edge_start_index = None
                 edge_end_index = None
 
-                # Determine the level of each node in the graph topology
                 for level_index in range(len(graph_topology)):
                     if edge_start in graph_topology[level_index]:
                         edge_start_index = level_index
@@ -89,7 +71,6 @@ def bruteforce_toposort(
                     if edge_start_index is not None and edge_end_index is not None:
                         break
 
-                # Determine if the edge is cyclic in the current graph topology
                 if edge_start_index >= edge_end_index:  # type: ignore[operator]
                     cyclic_edges.add((edge_start, edge_end))
 
@@ -111,11 +92,6 @@ def bruteforce_toposort(
 
 
 def create_groupings(inputs: list[int] | tuple[int, ...]) -> Iterator[list[set[int]]]:
-    """Generate all possible groupings of an iterable.
-
-    :param inputs: Iterable (e.g., list) of elements
-    :return: generator yielding lists of sets of grouped nodes
-    """
     for n in range(1, len(inputs) + 1):
         for split_indices in itertools.combinations(range(1, len(inputs)), n - 1):
             grouping = []
@@ -125,3 +101,10 @@ def create_groupings(inputs: list[int] | tuple[int, ...]) -> Iterator[list[set[i
                 grouping.append(group)
                 prev_split_index = split_index
             yield grouping
+
+
+
+def load_fixture(fixture_name: str) -> dict:
+    fixture_path = Path(__file__).parent / "fixtures" / f"{fixture_name}.json"
+    with fixture_path.open() as f:
+        return json.load(f)

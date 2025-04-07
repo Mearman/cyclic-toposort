@@ -8,7 +8,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:all": "tsx scripts/run-tests.ts",
+    "test:tap": "tsx scripts/run-tests.ts --tap"
   },
   "repository": {
     "type": "git",
@@ -23,9 +25,14 @@
   "homepage": "https://github.com/PaulPauls/cyclic-toposort#readme",
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "@types/yargs": "^17.0.33",
+    "prettier": "^3.5.3",
+    "tap-parser": "^18.0.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.16.2",
     "typescript": "^5.8.3",
-    "vitest": "^3.1.1"
+    "vitest": "^3.1.1",
+    "yargs": "^17.7.2"
   },
   "packageManager": "yarn@4.8.1"
 }
